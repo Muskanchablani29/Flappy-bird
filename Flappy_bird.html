@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #0a1f44;
+            overflow: hidden;
+        }
+        #game {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            background-color: rgb(110, 170, 110);
+            border: 2px solid black;
+            margin: auto;
+            overflow: hidden;
+            display: none;
+        }
+        #bird {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('Flappybirdimage.jpg');
+            background-size: cover;
+            border-radius: 50%;
+            top: 200px;
+            left: 50px;
+        }
+        .pipe, .topPipe {
+            position: absolute;
+            width: 60px;
+            background-color: #1e3a8a;
+        }
+        .pipe { bottom: 0; }
+        .topPipe { top: 0; }
+        .pole {
+            position: absolute;
+            width: 20px;
+            height: 120px;
+            background-color: #1e3a8a;
+            bottom: 0;
+        }
+        #score {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        #startButton, #restartButton {
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #restartButton {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: white;">Flappy Bird</h1>
+    <div id="score">Score: 0</div>
+    <button id="startButton">Start Game</button>
+    <div id="game">
+        <div id="bird"></div>
+    </div>
+    <button id="restartButton">Start Again</button>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let bird = $('#bird');
+            let game = $('#game');
+            let scoreDisplay = $('#score');
+            let gravity = 1.5;
+            let velocity = 0;
+            let jumpStrength = -8;
+            let isGameOver = false;
+            let score = 0;
+            let gameInterval, obstacleInterval;
+            
+            function jump() {
+                if (!isGameOver) {
+                    velocity = jumpStrength;
+                }
+            }
+            
+            $(document).keydown(function (e) {
+                if (e.keyCode === 32) { // Space bar
+                    jump();
+                }
+            });
+            
+            function gameLoop() {
+                if (!isGameOver) {
+                    velocity += gravity;
+                    let birdTop = parseInt(bird.css('top'));
+                    bird.css('top', birdTop + velocity + 'px');
+                    
+                    if (birdTop + velocity > game.height() - bird.height() || birdTop + velocity < 0) {
+                        endGame();
+                    }
+                }
+            }
+            
+            function createObstacle() {
+                if (!isGameOver) {
+                    let pipeHeight = Math.floor(Math.random() * 250) + 50;
+                    let gap = 120;
+                    let pipeBottom = $('<div class="pipe"></div>').css({
+                        height: pipeHeight + 'px',
+                        left: '600px'
+                    });
+                    let pipeTop = $('<div class="topPipe"></div>').css({
+                        height: (400 - pipeHeight - gap) + 'px',
+                        left: '600px'
+                    });
+                    
+                    game.append(pipeBottom);
+                    game.append(pipeTop);
+                    
+                    function moveObstacle() {
+                        if (!isGameOver) {
+                            let pipeLeft = parseInt(pipeBottom.css('left'));
+                            if (pipeLeft < -60) {
+                                pipeBottom.remove();
+                                pipeTop.remove();
+                                score += 10; // Increment score by 10 per pipe crossed
+                                scoreDisplay.text('Score: ' + score);
+                            } else {
+                                pipeBottom.css('left', pipeLeft - 4 + 'px');
+                                pipeTop.css('left', pipeLeft - 4 + 'px');
+                            }
+                            
+                            let birdTop = parseInt(bird.css('top'));
+                            let birdLeft = parseInt(bird.css('left'));
+                            
+                            if (
+                                birdLeft + bird.width() > pipeLeft && 
+                                birdLeft < pipeLeft + pipeBottom.width() && 
+                                (birdTop < pipeTop.height() || birdTop + bird.height() > game.height() - pipeBottom.height())
+                            ) {
+                                endGame();
+                            }
+                        }
+                    }
+                    
+                    let moveInterval = setInterval(moveObstacle, 30);
+                }
+            }
+            
+            function endGame() {
+                isGameOver = true;
+                clearInterval(gameInterval);
+                clearInterval(obstacleInterval);
+                $('#restartButton').show();
+            }
+            
+            $('#startButton').click(function () {
+                $('#startButton').hide();
+                game.show();
+                bird.css('top', '200px'); // Reset bird position
+                velocity = 0; // Reset velocity
+                isGameOver = false;
+                score = 0;
+                scoreDisplay.text('Score: ' + score);
+                gameInterval = setInterval(gameLoop, 30);
+                obstacleInterval = setInterval(createObstacle, 1800);
+            });
+            
+            $('#restartButton').click(function () {
+                location.reload();
+            });
+        });
+    </script>
+</body>
+</html>
