@@ -7,7 +7,7 @@
     <style>
         body {
             text-align: center;
-            background-color: #0a1f44;
+            background-color: #4b7cd1;
             overflow: hidden;
         }
         #game {
@@ -33,7 +33,7 @@
         .pipe, .topPipe {
             position: absolute;
             width: 60px;
-            background-color: #1e3a8a;
+            background-color: #0f2358;
         }
         .pipe { bottom: 0; }
         .topPipe { top: 0; }
@@ -41,7 +41,7 @@
             position: absolute;
             width: 20px;
             height: 120px;
-            background-color: #1e3a8a;
+            background-color: #506ab3;
             bottom: 0;
         }
         #score {
@@ -52,7 +52,7 @@
         #startButton, #restartButton {
             padding: 10px 20px;
             font-size: 20px;
-            background-color: #1e3a8a;
+            background-color: Red;
             color: white;
             border: none;
             cursor: pointer;
@@ -79,7 +79,7 @@
             let scoreDisplay = $('#score');
             let gravity = 1.5;
             let velocity = 0;
-            let jumpStrength = -8;
+            let jumpStrength = -9;
             let isGameOver = false;
             let score = 0;
             let gameInterval, obstacleInterval;
@@ -130,7 +130,7 @@
                             if (pipeLeft < -60) {
                                 pipeBottom.remove();
                                 pipeTop.remove();
-                                score += 10; // Increment score by 10 per pipe crossed
+                                score += 1; // Increment score by 10 per pipe crossed
                                 scoreDisplay.text('Score: ' + score);
                             } else {
                                 pipeBottom.css('left', pipeLeft - 4 + 'px');
